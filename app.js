@@ -24,11 +24,13 @@
   let serviceFeePercent = 5;
   let menuOpen = false;
   let adminUser = null;
+  let adminMfaVerified = false;
   let adminTab = "bookings";
   let adminVehicles = [];
   let adminBookings = [];
   let adminEnquiries = [];
   let dataLoadError = "";
+  let heroSlideshowTimer = null;
 
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   const slug = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -84,6 +86,7 @@
 
   function bookingWidget() {
     return `<form class="booking-widget" id="search-booking">
+      <div class="booking-intro"><div><span class="eyebrow">YOUR NEXT CHAPTER</span><strong>Make it a journey.</strong></div><span>Tell us where the road begins.</span></div>
       <div class="field"><label for="search-category">Choose your experience</label><select id="search-category" name="category"><option value="">All vehicle types</option>${(categories.length ? categories : [{ slug: "sedan", name: "Sedan" }, { slug: "suv", name: "SUV" }, { slug: "sports", name: "Sports" }, { slug: "van", name: "Van" }]).map((category) => `<option value="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</option>`).join("")}</select></div>
       <div class="field"><label for="search-pickup">Pick-up date</label><input id="search-pickup" name="pickup" type="date" min="${isoToday}" required></div>
       <div class="field"><label for="search-return">Return date</label><input id="search-return" name="return" type="date" min="${isoToday}" required></div>
@@ -95,11 +98,11 @@
   function homePage() {
     const featured = vehicles.filter((car) => car.is_featured).slice(0, 3);
     const display = featured.length ? featured : vehicles.slice(0, 3);
-    return `<section class="hero"><div class="hero-inner"><span class="eyebrow">VINI CAR RENTAL · INDIA</span><h1>Arrive with<br><em>intention.</em></h1><p class="hero-copy">A considered collection of exceptional cars, paired with the kind of service that makes every mile matter.</p><a class="button" href="#fleet">Explore the collection <span aria-hidden="true">↗</span></a></div></section>
+    return `<section class="hero"><div class="hero-slides" aria-hidden="true"><img class="hero-slide is-active" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2400&q=90" alt=""><img class="hero-slide" src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=2400&q=90" alt=""><img class="hero-slide" src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=2400&q=90" alt=""></div><div class="hero-inner"><span class="hero-kicker"><span class="hero-kicker-line"></span> VINI CAR RENTAL <span class="hero-kicker-dot"></span> INDIA</span><h1>Make the<br>road <em>yours.</em></h1><p class="hero-copy">Exceptional cars. Considered service.<br>A more beautiful way to arrive.</p><div class="hero-actions"><a class="button" href="#fleet">Discover the collection <span aria-hidden="true">↗</span></a><a class="hero-secondary-link" href="#about"><span class="play-icon">↗</span> The VINI experience</a></div></div><div class="hero-caption"><span class="hero-scroll"><i></i> SCROLL TO EXPLORE</span><span class="hero-caption-center">THE ART OF ARRIVING</span><span class="hero-edition">01 <i></i> 06</span></div></section>
       ${infoBar() ? `<div class="section section-tight">${infoBar()}</div>` : ""}${bookingWidget()}
-      <section class="section"><div class="section-heading"><div><span class="eyebrow">THE VINI COLLECTION</span><h2>Exceptional by nature.</h2></div><div><p>Chosen for their character. Prepared for your comfort. Ready for the road ahead.</p><a class="text-link" href="#fleet">View all vehicles <span>↗</span></a></div></div>
+      <section class="section"><div class="section-heading"><div><span class="eyebrow">A STUDY IN EXCEPTION</span><h2>Not simply driven.<br><em>Felt.</em></h2></div><div><p>Rarely ordinary. Always remarkable. Discover the cars that make every arrival part of the story.</p><a class="text-link" href="#fleet">Explore the collection <span>↗</span></a></div></div>
       <div class="vehicle-grid">${display.map((car) => vehicleCard(car)).join("")}</div></section>
-      <section class="editorial"><div class="editorial-image"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=85" alt="Sculpted luxury car detail" loading="lazy"></div><div class="editorial-copy"><span class="eyebrow">A DIFFERENT KIND OF DRIVE</span><h2>More than the car. The feeling it leaves.</h2><p>At VINI, luxury is in the details: a beautifully prepared vehicle, a human being ready to help, and the freedom to make the journey entirely your own.</p><a class="text-link" href="#about">Discover the VINI way <span>↗</span></a></div></section>
+      <section class="editorial"><div class="editorial-image"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=85" alt="Sculpted luxury car detail" loading="lazy"><span class="editorial-image-caption">A QUIETER KIND OF LUXURY <i>—</i> VINI, SINCE ALWAYS</span></div><div class="editorial-copy"><span class="eyebrow">A DIFFERENT KIND OF DRIVE</span><h2>The destination is only half the story.</h2><p>Luxury lives between the moments: a car waiting just as promised, the perfect temperature, the freedom to take the longer way home. We make space for all of it.</p><a class="text-link" href="#about">Discover the VINI way <span>↗</span></a></div></section>
       <section class="promise-strip"><div class="promise"><strong>Thoughtfully curated</strong><span>A distinctive fleet for every kind of occasion.</span></div><div class="promise"><strong>People, always</strong><span>Considered, personal service from first hello.</span></div><div class="promise"><strong>Clarity at every turn</strong><span>Transparent pricing. No unexpected detours.</span></div></section>`;
   }
 
@@ -173,10 +176,15 @@
   function adminPage() {
     if (!configured) return `${pageHero("VINI OPERATIONS", "Admin dashboard", "Connect Supabase to manage reservations, enquiries and your vehicle collection.")}<section class="section">${infoBar()}</section>`;
     if (!adminUser) return `${pageHero("VINI OPERATIONS", "Welcome back.", "Sign in with an administrator account to manage the VINI collection.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-login"><div class="page-heading"><span class="eyebrow">SECURE ADMINISTRATION</span><h1 style="font-size:34px">Team sign in.</h1></div><div class="form-grid"><div class="form-field full"><label for="admin-email">Email</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div><div class="form-field full"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required></div></div><p class="form-note">Admin access is granted to specific accounts using the Supabase SQL setup instructions. There is no public admin sign-up.</p><button class="button button-dark" type="submit">Sign in ↗</button><div id="admin-login-message"></div></form></div></section>`;
+    if (!adminMfaVerified) return `${pageHero("VINI OPERATIONS", "Verify your sign-in.", "Enter the one-time code sent to the administrator email address.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-otp-form"><div class="page-heading"><span class="eyebrow">EMAIL TWO-STEP VERIFICATION</span><h1 style="font-size:34px">One more step.</h1><p>Enter the verification code sent to the admin email address ending in <strong>@gmail.com</strong>.</p></div><div class="form-field"><label for="admin-otp-code">Email verification code</label><input id="admin-otp-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required></div><div class="admin-actions" style="margin-top:18px"><button class="button button-dark button-small" type="submit">Verify &amp; continue</button><button class="button button-outline button-small" type="button" id="admin-otp-resend">Send a new code</button><button class="button button-outline button-small" type="button" id="admin-signout">Cancel &amp; sign out</button></div><div id="admin-otp-message" aria-live="polite"></div></form></div></section>`;
     return `<section class="admin-shell"><div class="admin-top"><div><span class="eyebrow">VINI OPERATIONS</span><h1>Dashboard</h1></div><button class="button button-outline button-small" id="admin-signout">Sign out</button></div><div class="admin-tabs">${[["bookings", "Bookings"], ["vehicles", "Vehicles"], ["enquiries", "Enquiries"]].map(([key, title]) => `<button class="admin-tab${adminTab === key ? " active" : ""}" data-admin-tab="${key}">${title}</button>`).join("")}</div><div class="admin-panel" id="admin-panel"><div class="loading">Loading dashboard…</div></div></section>`;
   }
 
   function render() {
+    if (heroSlideshowTimer !== null) {
+      window.clearInterval(heroSlideshowTimer);
+      heroSlideshowTimer = null;
+    }
     menuOpen = false;
     document.body.classList.remove("menu-open");
     document.querySelector(".menu-toggle").setAttribute("aria-expanded", "false");
@@ -188,11 +196,13 @@
     if (dataLoadError && route.page !== "home" && route.page !== "fleet" && route.page !== "booking" && route.page !== "contact") {
       app.insertAdjacentHTML("afterbegin", `<div class="section section-tight">${notice(dataLoadError, true)}</div>`);
     }
-    if (route.page === "admin" && configured && adminUser) loadAdmin();
+    if (route.page === "admin" && configured && adminUser && adminMfaVerified) loadAdmin();
     if (route.page === "booking") updateQuote();
   }
 
   function bindPage(route) {
+    if (route.page === "home") startHeroSlideshow();
+
     const bookingSearch = document.querySelector("#search-booking");
     if (bookingSearch) {
       const pickup = bookingSearch.elements.pickup;
@@ -210,6 +220,18 @@
         if (values.get("location")) query.set("location", values.get("location"));
         go(`fleet?${query}`);
       });
+    }
+
+    function startHeroSlideshow() {
+      const slides = [...document.querySelectorAll(".hero-slide")];
+      if (slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      let activeIndex = slides.findIndex((slide) => slide.classList.contains("is-active"));
+      heroSlideshowTimer = window.setInterval(() => {
+        slides[activeIndex].classList.remove("is-active");
+        activeIndex = (activeIndex + 1) % slides.length;
+        slides[activeIndex].classList.add("is-active");
+      }, 7000);
     }
 
     if (route.page === "fleet") bindFleet(route.params);
@@ -435,22 +457,67 @@
         return;
       }
       adminUser = data.user;
+      adminMfaVerified = false;
       const { data: isAdmin, error: roleError } = await db.rpc("is_admin");
       if (roleError || !isAdmin) {
         await db.auth.signOut();
         adminUser = null;
+        adminMfaVerified = false;
         document.querySelector("#admin-login-message").innerHTML = notice(roleError?.message || "This account does not have administrator access.", true);
         return;
       }
       render();
+      await requestAdminOtp();
     });
+    document.querySelector("#admin-otp-form")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('[type="submit"]');
+      const message = document.querySelector("#admin-otp-message");
+      button.disabled = true;
+      message.innerHTML = notice("Checking your verification code…");
+      const { error } = await db.functions.invoke("admin-email-otp", {
+        body: { action: "verify", code: new FormData(form).get("code") }
+      });
+      button.disabled = false;
+      if (error) {
+        message.innerHTML = notice(error.message || "The code could not be verified. Check it or request a new code.", true);
+        return;
+      }
+      const { data: verified, error: verificationError } = await db.rpc("is_verified_admin");
+      if (verificationError || !verified) {
+        message.innerHTML = notice(verificationError?.message || "Verification was not completed. Please try again.", true);
+        return;
+      }
+      adminMfaVerified = true;
+      render();
+    });
+    document.querySelector("#admin-otp-resend")?.addEventListener("click", requestAdminOtp);
     document.querySelector("#admin-signout")?.addEventListener("click", async () => {
       const { error } = await db.auth.signOut();
       if (error) return toast(error.message, true);
       adminUser = null;
+      adminMfaVerified = false;
       render();
     });
     document.querySelectorAll("[data-admin-tab]").forEach((button) => button.addEventListener("click", () => { adminTab = button.dataset.adminTab; render(); }));
+  }
+
+  async function requestAdminOtp() {
+    const message = document.querySelector("#admin-otp-message");
+    const sendButton = document.querySelector("#admin-otp-resend");
+    const submitButton = document.querySelector("#admin-login button[type='submit']");
+    if (message) message.innerHTML = notice("Sending your WhatsApp verification code…");
+    if (sendButton) sendButton.disabled = true;
+    if (submitButton) submitButton.disabled = true;
+    const { error } = await db.functions.invoke("admin-email-otp", { body: { action: "send" } });
+    if (sendButton) sendButton.disabled = false;
+    if (submitButton) submitButton.disabled = false;
+    const target = document.querySelector("#admin-otp-message") || document.querySelector("#admin-login-message");
+    if (target) target.innerHTML = error
+      ? notice(`${error.message || "Could not send an email code."} Check that the admin email function and email-provider secrets are configured.`, true)
+      : notice("A six-digit verification code has been sent to the administrator email address. It expires in 10 minutes.");
   }
 
   async function loadAdmin() {
@@ -597,8 +664,14 @@
     else if (sessionResult.data.session) {
       const { data: isAdmin, error } = await db.rpc("is_admin");
       if (error) console.error("Could not verify admin role:", error.message);
-      else if (isAdmin) adminUser = sessionResult.data.session.user;
-      else await db.auth.signOut();
+      else if (isAdmin) {
+        const { data: isVerified, error: mfaError } = await db.rpc("is_verified_admin");
+        if (mfaError) console.error("Could not restore admin WhatsApp verification:", mfaError.message);
+        adminUser = sessionResult.data.session.user;
+        adminMfaVerified = Boolean(isVerified);
+      } else {
+        await db.auth.signOut();
+      }
     }
     dataLoadError = loadErrors.join(" ");
     render();
@@ -622,7 +695,10 @@
 
   if (db) {
     db.auth.onAuthStateChange((_event, session) => {
-      if (!session) adminUser = null;
+      if (!session) {
+        adminUser = null;
+        adminMfaVerified = false;
+      }
     });
     initializeData();
   } else render();
