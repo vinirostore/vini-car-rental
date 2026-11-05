@@ -1,6 +1,6 @@
 # VINI CAR RENTAL — static hosting & Supabase setup
 
-This site is plain HTML, CSS and browser JavaScript. It does not use a Node.js server, build step, npm runtime, or MilesWeb application slot. Supabase supplies the database, sign-in and image storage. Admin email OTP runs in a Supabase Edge Function; no server process runs on MilesWeb.
+This site is plain HTML, CSS and browser JavaScript. It does not use a Node.js server, build step, npm runtime, or MilesWeb application slot. Supabase supplies the database, email/password sign-in and image storage.
 
 ## 1. Create the Supabase project
 
@@ -25,35 +25,15 @@ This site is plain HTML, CSS and browser JavaScript. It does not use a Node.js s
 
    This privileged role assignment is intentionally not exposed through the public website. Use a strong unique password and enable MFA for admin accounts where available.
 
-## 2. Require email OTP for admin sign-in
+## 2. Use email/password for admin sign-in
 
-After the admin email/password is accepted, the portal sends a random six-digit one-time code to **vinirostore@gmail.com**. Admin database and storage access is denied until the code is verified. Codes expire in 10 minutes, can be used once, and allow at most six verification attempts. Each Supabase sign-in session is authorized for 30 minutes after email verification.
+The admin portal signs in with the email and password for an account created under **Authentication → Users**. The account must have `role = 'admin'` in `public.profiles`; there is no public admin sign-up. Admin database and Storage policies check this role directly.
 
-1. In your existing [Brevo](https://app.brevo.com/) account, open **Transactional → Senders, domains & dedicated IPs** and make sure the sender email address/domain you plan to use is verified. Open **SMTP & API → API Keys** and create/copy a Brevo API key. Keep it private.
-2. In your existing Supabase project, open **SQL Editor**, paste in [`supabase/admin-email-mfa.sql`](./supabase/admin-email-mfa.sql), and run it. This adds the OTP, rate-limit and verified-session tables and changes database/storage admin policies to require completed email verification.
-3. Deploy the Edge Function `supabase/functions/admin-email-otp/index.ts` as `admin-email-otp` to project `voqfeireufyayrslnpec`. Using the Supabase CLI from this project directory:
+If you previously enabled email OTP for this project, run [`supabase/admin-password-only.sql`](./supabase/admin-password-only.sql) in the Supabase **SQL Editor**. This restores role-based admin access for the database and vehicle-photo storage. Then deploy the updated `app.js` with your website. The old OTP tables can remain unused.
 
-   ```text
-   supabase login
-   supabase link --project-ref voqfeireufyayrslnpec
-   supabase functions deploy admin-email-otp
-   ```
+The previously deployed `admin-email-otp` Edge Function is no longer called by the site. You may delete it from **Edge Functions → `admin-email-otp`** and remove the `BREVO_API_KEY` and `ADMIN_OTP_*` custom secrets if they are no longer used elsewhere. Do not remove Supabase's default secrets.
 
-   Keep the function's default JWT verification enabled.
-4. In Supabase **Edge Functions → Secrets**, add:
-
-   | Secret name | Value |
-   | --- | --- |
-   | `BREVO_API_KEY` | Your Brevo API key |
-   | `ADMIN_OTP_FROM_EMAIL` | The exact sender email address verified in Brevo |
-   | `ADMIN_OTP_EMAIL` | `vinirostore@gmail.com` |
-   | `ADMIN_OTP_HMAC_SECRET` | A random secret of at least 32 characters, generated privately |
-   | `ADMIN_OTP_ALLOWED_ORIGINS` | `http://localhost:8080,https://YOUR-LIVE-DOMAIN` |
-
-   Set `ADMIN_OTP_FROM_EMAIL` to the exact verified sender email in your Brevo account. Replace `https://YOUR-LIVE-DOMAIN` with the exact production origin (scheme and hostname, no trailing slash); add any `www` origin separately if used. Generate the HMAC secret locally with a password manager or a cryptographically secure generator, for example `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Do not share or commit it. Supabase provides its project URL and service-role key to Edge Functions automatically; do not put those secrets in browser files.
-5. Reload the website, open `/#admin`, sign in, then check the admin mailbox (and spam folder) for the code. Each account is limited to 3 code sends and 6 code checks per 15 minutes.
-
-Brevo availability, sending limits and sender-verification requirements depend on its current plan and account. Do not grant admin RLS access based only on the email/password login. The migration enforces the email OTP check at the database and Storage policy layer as well as in the portal UI.
+Use a strong, unique password for each administrator. Password-only sign-in is less secure than adding a second verification factor.
 
 ## 3. Upload to MilesWeb
 

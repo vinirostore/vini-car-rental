@@ -24,7 +24,6 @@
   let serviceFeePercent = 5;
   let menuOpen = false;
   let adminUser = null;
-  let adminMfaVerified = false;
   let adminTab = "bookings";
   let adminVehicles = [];
   let adminBookings = [];
@@ -155,7 +154,7 @@
 
   function contactPage() {
     return `${pageHero("WE ARE HERE FOR YOU", "A real person, just a message away.", "Tell us about your plans. We would love to help you find the right way there.")}
-      <section class="section section-tight"><div class="contact-grid"><div><div class="contact-card"><span class="eyebrow">LET'S TALK</span><h2>Good journeys begin with a conversation.</h2><p style="color:rgb(255 255 255 / 70%);font-size:12px">Our team is happy to help with a reservation, a vehicle question or a bespoke request.</p><div class="contact-line"><small>Call / WhatsApp</small><a href="https://wa.me/919104881806" target="_blank" rel="noopener">+91 91048 81806 · Message us ↗</a></div><div class="contact-line"><small>Email</small><a href="mailto:hello@vinicarrental.com">hello@vinicarrental.com</a></div></div></div>
+      <section class="section section-tight"><div class="contact-grid"><div><div class="contact-card"><span class="eyebrow">LET'S TALK</span><h2>Good journeys begin with a conversation.</h2><p style="color:rgb(255 255 255 / 70%);font-size:12px">Our team is happy to help with a reservation, a vehicle question or a bespoke request.</p><div class="contact-line"><small>Call / WhatsApp</small><a href="https://wa.me/919104881806" target="_blank" rel="noopener">+91 91048 81806 · Message us ↗</a></div><div class="contact-line"><small>Email</small><a href="mailto:vinicarrental@gmail.com">vinicarrental@gmail.com</a></div></div></div>
       <div><div class="form-card">${infoBar()}<form id="contact-form"><div class="form-grid"><div class="form-field"><label for="contact-name">Your name</label><input id="contact-name" name="name" required minlength="2"></div><div class="form-field"><label for="contact-email">Email address</label><input id="contact-email" name="email" type="email" required></div><div class="form-field"><label for="contact-phone">Phone (optional)</label><input id="contact-phone" name="phone" type="tel"></div><div class="form-field"><label for="contact-subject">How can we help?</label><select id="contact-subject" name="subject"><option>Booking enquiry</option><option>Fleet question</option><option>Corporate travel</option><option>Other</option></select></div><div class="form-field full"><label for="contact-message">Your message</label><textarea id="contact-message" name="message" required minlength="10" maxlength="3000"></textarea></div></div><button class="button button-dark" type="submit"${configured ? "" : " disabled"}>Send your enquiry ↗</button></form></div></div></div></section>`;
   }
 
@@ -176,7 +175,6 @@
   function adminPage() {
     if (!configured) return `${pageHero("VINI OPERATIONS", "Admin dashboard", "Connect Supabase to manage reservations, enquiries and your vehicle collection.")}<section class="section">${infoBar()}</section>`;
     if (!adminUser) return `${pageHero("VINI OPERATIONS", "Welcome back.", "Sign in with an administrator account to manage the VINI collection.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-login"><div class="page-heading"><span class="eyebrow">SECURE ADMINISTRATION</span><h1 style="font-size:34px">Team sign in.</h1></div><div class="form-grid"><div class="form-field full"><label for="admin-email">Email</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div><div class="form-field full"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required></div></div><p class="form-note">Admin access is granted to specific accounts using the Supabase SQL setup instructions. There is no public admin sign-up.</p><button class="button button-dark" type="submit">Sign in ↗</button><div id="admin-login-message"></div></form></div></section>`;
-    if (!adminMfaVerified) return `${pageHero("VINI OPERATIONS", "Verify your sign-in.", "Enter the one-time code sent to the administrator email address.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-otp-form"><div class="page-heading"><span class="eyebrow">EMAIL TWO-STEP VERIFICATION</span><h1 style="font-size:34px">One more step.</h1><p>Enter the verification code sent to the admin email address ending in <strong>@gmail.com</strong>.</p></div><div class="form-field"><label for="admin-otp-code">Email verification code</label><input id="admin-otp-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required></div><div class="admin-actions" style="margin-top:18px"><button class="button button-dark button-small" type="submit">Verify &amp; continue</button><button class="button button-outline button-small" type="button" id="admin-otp-resend">Send a new code</button><button class="button button-outline button-small" type="button" id="admin-signout">Cancel &amp; sign out</button></div><div id="admin-otp-message" aria-live="polite"></div></form></div></section>`;
     return `<section class="admin-shell"><div class="admin-top"><div><span class="eyebrow">VINI OPERATIONS</span><h1>Dashboard</h1></div><button class="button button-outline button-small" id="admin-signout">Sign out</button></div><div class="admin-tabs">${[["bookings", "Bookings"], ["vehicles", "Vehicles"], ["enquiries", "Enquiries"]].map(([key, title]) => `<button class="admin-tab${adminTab === key ? " active" : ""}" data-admin-tab="${key}">${title}</button>`).join("")}</div><div class="admin-panel" id="admin-panel"><div class="loading">Loading dashboard…</div></div></section>`;
   }
 
@@ -196,7 +194,7 @@
     if (dataLoadError && route.page !== "home" && route.page !== "fleet" && route.page !== "booking" && route.page !== "contact") {
       app.insertAdjacentHTML("afterbegin", `<div class="section section-tight">${notice(dataLoadError, true)}</div>`);
     }
-    if (route.page === "admin" && configured && adminUser && adminMfaVerified) loadAdmin();
+    if (route.page === "admin" && configured && adminUser) loadAdmin();
     if (route.page === "booking") updateQuote();
   }
 
@@ -457,67 +455,22 @@
         return;
       }
       adminUser = data.user;
-      adminMfaVerified = false;
       const { data: isAdmin, error: roleError } = await db.rpc("is_admin");
       if (roleError || !isAdmin) {
         await db.auth.signOut();
         adminUser = null;
-        adminMfaVerified = false;
         document.querySelector("#admin-login-message").innerHTML = notice(roleError?.message || "This account does not have administrator access.", true);
         return;
       }
       render();
-      await requestAdminOtp();
     });
-    document.querySelector("#admin-otp-form")?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      if (!form.reportValidity()) return;
-      const button = form.querySelector('[type="submit"]');
-      const message = document.querySelector("#admin-otp-message");
-      button.disabled = true;
-      message.innerHTML = notice("Checking your verification code…");
-      const { error } = await db.functions.invoke("admin-email-otp", {
-        body: { action: "verify", code: new FormData(form).get("code") }
-      });
-      button.disabled = false;
-      if (error) {
-        message.innerHTML = notice(error.message || "The code could not be verified. Check it or request a new code.", true);
-        return;
-      }
-      const { data: verified, error: verificationError } = await db.rpc("is_verified_admin");
-      if (verificationError || !verified) {
-        message.innerHTML = notice(verificationError?.message || "Verification was not completed. Please try again.", true);
-        return;
-      }
-      adminMfaVerified = true;
-      render();
-    });
-    document.querySelector("#admin-otp-resend")?.addEventListener("click", requestAdminOtp);
     document.querySelector("#admin-signout")?.addEventListener("click", async () => {
       const { error } = await db.auth.signOut();
       if (error) return toast(error.message, true);
       adminUser = null;
-      adminMfaVerified = false;
       render();
     });
     document.querySelectorAll("[data-admin-tab]").forEach((button) => button.addEventListener("click", () => { adminTab = button.dataset.adminTab; render(); }));
-  }
-
-  async function requestAdminOtp() {
-    const message = document.querySelector("#admin-otp-message");
-    const sendButton = document.querySelector("#admin-otp-resend");
-    const submitButton = document.querySelector("#admin-login button[type='submit']");
-    if (message) message.innerHTML = notice("Sending your WhatsApp verification code…");
-    if (sendButton) sendButton.disabled = true;
-    if (submitButton) submitButton.disabled = true;
-    const { error } = await db.functions.invoke("admin-email-otp", { body: { action: "send" } });
-    if (sendButton) sendButton.disabled = false;
-    if (submitButton) submitButton.disabled = false;
-    const target = document.querySelector("#admin-otp-message") || document.querySelector("#admin-login-message");
-    if (target) target.innerHTML = error
-      ? notice(`${error.message || "Could not send an email code."} Check that the admin email function and email-provider secrets are configured.`, true)
-      : notice("A six-digit verification code has been sent to the administrator email address. It expires in 10 minutes.");
   }
 
   async function loadAdmin() {
@@ -665,10 +618,7 @@
       const { data: isAdmin, error } = await db.rpc("is_admin");
       if (error) console.error("Could not verify admin role:", error.message);
       else if (isAdmin) {
-        const { data: isVerified, error: mfaError } = await db.rpc("is_verified_admin");
-        if (mfaError) console.error("Could not restore admin WhatsApp verification:", mfaError.message);
         adminUser = sessionResult.data.session.user;
-        adminMfaVerified = Boolean(isVerified);
       } else {
         await db.auth.signOut();
       }
@@ -697,7 +647,6 @@
     db.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         adminUser = null;
-        adminMfaVerified = false;
       }
     });
     initializeData();
