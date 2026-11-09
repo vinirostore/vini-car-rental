@@ -401,3 +401,580 @@ body { background: var(--paper); }
   .hero-slide, .hero-scroll i::after { animation: none; }
   .hero-slide { transition: none; }
 }
+
+
+/* --------------------------------------------------------------------------
+   VINI premium type system and refined admin experience
+   -------------------------------------------------------------------------- */
+:root {
+  --serif: "Cormorant Garamond", "Iowan Old Style", "Times New Roman", serif;
+  --sans: "Manrope", "Avenir Next", Avenir, Arial, sans-serif;
+  --type-display: var(--serif);
+  --type-ui: var(--sans);
+  --type-body: 15.5px;
+  --type-small: 12px;
+  --type-label: 10px;
+  --ink: #191c21;
+  --muted: #73716c;
+  --line: #e7e1d6;
+}
+
+html {
+  font-size: 16px;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  scroll-padding-top: 100px;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--type-body);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+}
+
+button, input, select, textarea {
+  font-family: var(--sans);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+}
+
+h1, h2, h3, h4,
+.hero h1,
+.section-heading h2,
+.editorial-copy h2,
+.page-hero h1,
+.page-heading h1,
+.details-panel h1,
+.admin-top h1,
+.faq-question,
+.contact-card h2,
+.prose h2,
+.promise strong,
+.footer-note p,
+.booking-intro strong,
+.vehicle-title {
+  font-family: var(--type-display);
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-synthesis: none;
+  text-wrap: balance;
+}
+
+p, li, .faq-answer, .prose p, .prose li {
+  text-wrap: pretty;
+}
+
+.announcement {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .19em;
+}
+
+.main-nav a {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .015em;
+}
+
+.header-cta {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .075em;
+}
+
+.hero-kicker,
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .19em;
+  line-height: 1.5;
+}
+
+.hero h1 {
+  font-size: clamp(76px, 9.2vw, 132px);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: .91;
+}
+
+.hero-copy {
+  font-size: 15.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.85;
+}
+
+.hero-secondary-link,
+.hero .button,
+.button,
+.text-link {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .085em;
+}
+
+.hero-caption {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .17em;
+}
+
+.section-heading h2,
+.editorial-copy h2 {
+  font-size: clamp(43px, 5.1vw, 68px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: 1.02;
+}
+
+.section-heading p,
+.editorial-copy p,
+.page-hero p,
+.page-heading p,
+.prose p,
+.prose li,
+.faq-answer {
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.booking-intro .eyebrow {
+  font-size: 9.5px;
+  letter-spacing: .16em;
+}
+
+.booking-intro strong {
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -.025em;
+}
+
+.booking-intro > span {
+  font-size: 11.5px;
+}
+
+.booking-widget .field label,
+.form-field label,
+.contact-line small {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+
+.booking-widget input,
+.booking-widget select,
+.form-field input,
+.form-field select,
+.form-field textarea,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.sort-select {
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+.vehicle-category {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+
+.vehicle-title {
+  font-size: clamp(25px, 2vw, 29px);
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.12;
+}
+
+.vehicle-specs {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  line-height: 1.5;
+}
+
+.vehicle-price {
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.vehicle-price small,
+.detail-price small {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.vehicle-tag,
+.editorial-image-caption {
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+
+.page-hero h1 {
+  font-size: clamp(48px, 5.8vw, 72px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: .99;
+}
+
+.page-hero p {
+  font-size: 14px;
+  max-width: 540px;
+}
+
+.page-heading h1,
+.form-heading-title {
+  color: var(--navy);
+  font-family: var(--type-display);
+  font-size: clamp(38px, 4vw, 48px);
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1.05;
+  margin: 10px 0 0;
+}
+
+.form-card-title {
+  color: var(--navy);
+  font-family: var(--type-display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  margin: 0 0 18px;
+}
+
+.faq-question {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.015em;
+  line-height: 1.3;
+}
+
+.contact-card h2 {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.1;
+}
+
+.contact-intro {
+  color: rgb(255 255 255 / 73%);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.contact-line a,
+.contact-line span {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.form-note,
+.notice,
+.quote-line {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.filter-chip {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .045em;
+  text-transform: none;
+}
+
+.admin-top h1 {
+  font-size: 43px;
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1;
+}
+
+.admin-tab {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.admin-list {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.admin-list th {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.admin-actions button,
+.admin-actions a {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  min-height: 34px;
+  padding: 7px 11px;
+}
+
+.admin-form .form-field label {
+  font-size: 10.5px;
+}
+
+.admin-checkboxes {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 26px;
+}
+
+.admin-checkboxes label {
+  align-items: center;
+  color: #45474c;
+  display: inline-flex;
+  gap: 9px;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.admin-checkboxes input {
+  accent-color: var(--navy);
+  height: 16px;
+  min-height: 16px !important;
+  width: 16px;
+}
+
+.admin-form-actions {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-card--spaced { margin-top: 24px; }
+.form-field--end { align-self: end; }
+.button-block { width: 100%; }
+
+.admin-section-heading {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+}
+
+.admin-section-title {
+  color: var(--navy);
+  font-family: var(--type-display);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1;
+  margin: 5px 0 4px;
+}
+
+.admin-section-heading .form-note {
+  margin: 7px 0 0;
+}
+
+.admin-count {
+  background: #f3f0e9;
+  border: 1px solid #e7e1d6;
+  color: var(--navy);
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  padding: 8px 12px;
+}
+
+.admin-table-wrap {
+  margin-top: 22px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.admin-list td strong {
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.admin-subtext {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.admin-number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-status {
+  align-items: center;
+  display: inline-flex;
+  font-size: 10.5px;
+  font-weight: 800;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.admin-status::before {
+  background: currentColor;
+  border-radius: 50%;
+  content: "";
+  height: 6px;
+  width: 6px;
+}
+
+.admin-status.is-available { color: #26734d; }
+.admin-status.is-hidden { color: #8b6c35; }
+
+.admin-actions .admin-delete {
+  border-color: #ecd6d3;
+  color: #a13f38;
+}
+
+.admin-actions .admin-delete:hover:not(:disabled) {
+  background: #a13f38;
+  border-color: #a13f38;
+  color: #fff;
+}
+
+.admin-actions button:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.admin-delete-note {
+  color: #77736b;
+  font-size: 11.5px;
+  line-height: 1.7;
+  margin: 15px 0 0;
+}
+
+.admin-delete-note strong { color: var(--navy); }
+.admin-empty { padding: 24px; }
+
+.admin-panel {
+  border-color: #e9e3d8;
+  box-shadow: 0 18px 55px rgb(9 21 37 / 5%);
+}
+
+.admin-list th,
+.admin-list td {
+  padding: 15px 12px;
+}
+
+.admin-list tbody tr:hover {
+  background: #fcfbf8;
+}
+
+.footer-main h2 {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.footer-main > div:not(:first-child) > a:not(.text-link) {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.footer-bottom {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #b58e51;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #e9dcc2;
+  color: #101d32;
+}
+
+@media (max-width: 900px) {
+  .hero h1 { font-size: clamp(72px, 11vw, 106px); }
+  .section-heading h2,
+  .editorial-copy h2 { font-size: clamp(43px, 6vw, 58px); }
+  .admin-shell { padding-left: 22px; padding-right: 22px; }
+  .admin-panel { overflow: visible; }
+  .admin-list { min-width: 760px; }
+}
+
+@media (max-width: 650px) {
+  :root { --type-body: 14.5px; }
+  .announcement { font-size: 8px; letter-spacing: .12em; }
+  .main-nav a { font-size: 13px; }
+  .header-cta { font-size: 9px; }
+  .hero h1 { font-size: clamp(65px, 15.5vw, 84px); line-height: .94; }
+  .hero-copy { font-size: 14px; line-height: 1.75; }
+  .hero-secondary-link { font-size: 10px; }
+  .hero-caption { font-size: 8px; letter-spacing: .12em; }
+  .editorial-image-caption { font-size: 8px; }
+  .section-heading h2,
+  .editorial-copy h2 { font-size: clamp(42px, 11vw, 54px); }
+  .section-heading p,
+  .editorial-copy p,
+  .page-hero p,
+  .prose p,
+  .prose li,
+  .faq-answer { font-size: 13.5px; }
+  .booking-intro strong { font-size: 23px; }
+  .booking-intro > span { font-size: 11px; }
+  .booking-widget .field label,
+  .form-field label { font-size: 9.5px; }
+  .booking-widget input,
+  .booking-widget select,
+  .form-field input,
+  .form-field select,
+  .form-field textarea { font-size: 13px; }
+  .vehicle-title { font-size: 26px; }
+  .vehicle-specs { font-size: 10.5px; gap: 12px; }
+  .filter-chip { font-size: 10px; }
+  .faq-question { font-size: 20px; }
+  .contact-card h2 { font-size: 31px; }
+  .admin-shell { padding: 32px 16px; }
+  .admin-top h1 { font-size: 38px; }
+  .admin-panel { padding: 16px; overflow: visible; }
+  .admin-form { grid-template-columns: 1fr; }
+  .admin-form .full { grid-column: 1 / -1; }
+  .admin-list { min-width: 760px; }
+  .admin-section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .admin-section-title { font-size: 33px; }
+  .admin-count { align-self: flex-start; }
+  .admin-actions { gap: 6px; }
+  .admin-actions button,
+  .admin-actions a { font-size: 10.5px; min-height: 36px; }
+  .admin-checkboxes { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .admin-form-actions { flex-direction: column; align-items: stretch; }
+  .admin-form-actions .button { width: 100%; }
+  .form-card-title { font-size: 28px; }
+}

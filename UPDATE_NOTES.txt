@@ -1,0 +1,18 @@
+VINI CAR RENTAL — SOURCE UPDATE
+
+Included files
+- index.html: updated Google Fonts import and cache-busting for the refreshed CSS/JS.
+- styles.css: premium Cormorant Garamond + Manrope typography system, improved sizing/readability, responsive admin styling.
+- app.js: Admin > Vehicles now has a confirmed Delete action; it checks booking history first and blocks deletion when bookings exist.
+- supabase-config.js: original project URL and public publishable key retained unchanged.
+- DEPLOYMENT.md: updated setup and deployment notes.
+- supabase/admin-delete-vehicles.sql: run once in Supabase SQL Editor after the base schema to grant delete only to authenticated admins.
+
+Deploy
+1. Back up the current website files.
+2. Replace index.html, styles.css and app.js on the website with these updated copies. Keep your existing logo and vehicle image files in the document root.
+3. Keep your existing supabase-config.js values. The included copy is unchanged from the uploaded source.
+4. Run supabase/admin-delete-vehicles.sql once in the Supabase SQL Editor while signed in as the project owner.
+5. Test admin sign-in, Add/Edit/Hide, Delete on a vehicle with no bookings, and confirm that a vehicle with booking history is blocked from deletion.
+
+The base Supabase schema and image assets were not included in the uploaded source set, so they are not recreated or replaced in this package. Existing database tables, booking logic and image assets are intended to remain in place.

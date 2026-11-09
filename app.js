@@ -125,13 +125,13 @@
     return `${pageHero(category.toUpperCase(), `${car.make} ${car.model}`, `${car.year} · ${car.description || "A considered companion for your next journey."}`)}
       <section class="section section-tight"><div class="details-layout"><div><img class="details-main-image" id="details-main-image" src="${escapeHtml(gallery[0] || "")}" alt="${escapeHtml(`${car.make} ${car.model}`)}">${gallery.length > 1 ? `<div class="gallery-thumbs">${gallery.map((url) => `<img src="${escapeHtml(url)}" alt="View ${escapeHtml(car.make)} ${escapeHtml(car.model)}" data-gallery-image="${escapeHtml(url)}" loading="lazy">`).join("")}</div>` : ""}
       <div class="prose"><h2>Designed around your journey</h2><p>${escapeHtml(car.description || "")}</p><div class="feature-list">${(car.features || []).map((feature) => `<span>${escapeHtml(feature)}</span>`).join("")}</div></div></div>
-      <aside class="details-panel"><span class="eyebrow">${escapeHtml(category)} · ${escapeHtml(car.year)}</span><h1>${escapeHtml(car.make)} ${escapeHtml(car.model)}</h1><div class="vehicle-specs"><span>${escapeHtml(car.seats)} seats</span><span>${escapeHtml(car.luggage || 2)} bags</span><span>${escapeHtml(car.transmission || "Automatic")}</span><span>${escapeHtml(car.fuel || "Premium")}</span></div><div class="detail-price">${money.format(Number(car.daily_rate || 0))} <small>/ day</small></div><p class="form-note">Your final quote includes rental days and applicable service fees. No surprises, just clarity.</p><a class="button button-dark" style="width:100%" href="#booking?${bookingParams}">Reserve this car <span aria-hidden="true">↗</span></a><p class="form-note">Availability is confirmed when our team accepts your request.</p></aside></div></section>`;
+      <aside class="details-panel"><span class="eyebrow">${escapeHtml(category)} · ${escapeHtml(car.year)}</span><h1>${escapeHtml(car.make)} ${escapeHtml(car.model)}</h1><div class="vehicle-specs"><span>${escapeHtml(car.seats)} seats</span><span>${escapeHtml(car.luggage || 2)} bags</span><span>${escapeHtml(car.transmission || "Automatic")}</span><span>${escapeHtml(car.fuel || "Premium")}</span></div><div class="detail-price">${money.format(Number(car.daily_rate || 0))} <small>/ day</small></div><p class="form-note">Your final quote includes rental days and applicable service fees. No surprises, just clarity.</p><a class="button button-dark button-block" href="#booking?${bookingParams}">Reserve this car <span aria-hidden="true">↗</span></a><p class="form-note">Availability is confirmed when our team accepts your request.</p></aside></div></section>`;
   }
 
   function bookingPage(params) {
     const chosen = params.get("vehicle") || "";
     return `${pageHero("YOUR JOURNEY STARTS HERE", "A few details. Then the open road.", "Tell us when and where. We will take care of the rest.")}
-      <section class="section section-tight"><div class="content-narrow">${infoBar()}<form class="form-card" id="booking-form"><div class="page-heading"><span class="eyebrow">RESERVATION REQUEST</span><h1 style="font-size:34px">Plan your drive.</h1><p>Share your details and continue to WhatsApp to send your reservation request to our team.</p></div>
+      <section class="section section-tight"><div class="content-narrow">${infoBar()}<form class="form-card" id="booking-form"><div class="page-heading"><span class="eyebrow">RESERVATION REQUEST</span><h1 class="form-heading-title">Plan your drive.</h1><p>Share your details and continue to WhatsApp to send your reservation request to our team.</p></div>
       <div class="form-grid"><div class="form-field"><label for="booking-vehicle">Your vehicle</label><select id="booking-vehicle" name="vehicle" required><option value="">Select a vehicle</option>${vehicles.filter((car) => car.is_available).map((car) => `<option value="${escapeHtml(car.id)}"${car.id === chosen ? " selected" : ""}>${escapeHtml(car.make)} ${escapeHtml(car.model)} — ${money.format(Number(car.daily_rate))}/day</option>`).join("")}</select></div>
       <div class="form-field"><label for="booking-location">Pick-up location</label><input id="booking-location" name="location" required placeholder="City, hotel or airport" value="${escapeHtml(params.get("location") || "")}"></div>
       <div class="form-field"><label for="booking-pickup">Pick-up date</label><input id="booking-pickup" name="pickup" type="date" min="${isoToday}" value="${escapeHtml(params.get("pickup") || "")}" required></div>
@@ -143,7 +143,7 @@
       <div class="quote-box" id="booking-quote"><div class="quote-line"><span>Select your dates and vehicle to see your quote</span><span>—</span></div></div><div id="availability-message" aria-live="polite"></div>
       <p class="form-note">Your request will open WhatsApp to <strong>+91 91048 81806</strong> with your details and estimated quote ready to send. Availability is confirmed by our team; no payment is taken here.</p>
       <button class="button button-dark" type="submit">Continue to WhatsApp <span aria-hidden="true">↗</span></button></form>
-      <div class="form-card" style="margin-top:24px"><span class="eyebrow">ALREADY RESERVED?</span><h2 style="font:400 27px var(--serif);color:var(--navy)">Check your booking status.</h2><form id="status-form" class="form-grid"><div class="form-field"><label for="status-code">Booking reference</label><input id="status-code" name="code" required placeholder="Paste your booking reference"></div><div class="form-field" style="align-self:end"><button class="button button-outline" type="submit">Check status</button></div></form><div id="status-result"></div></div></div></section>`;
+      <div class="form-card form-card--spaced"><span class="eyebrow">ALREADY RESERVED?</span><h2 class="form-card-title">Check your booking status.</h2><form id="status-form" class="form-grid"><div class="form-field"><label for="status-code">Booking reference</label><input id="status-code" name="code" required placeholder="Paste your booking reference"></div><div class="form-field" style="align-self:end"><button class="button button-outline" type="submit">Check status</button></div></form><div id="status-result"></div></div></div></section>`;
   }
 
   function aboutPage() {
@@ -154,7 +154,7 @@
 
   function contactPage() {
     return `${pageHero("WE ARE HERE FOR YOU", "A real person, just a message away.", "Tell us about your plans. We would love to help you find the right way there.")}
-      <section class="section section-tight"><div class="contact-grid"><div><div class="contact-card"><span class="eyebrow">LET'S TALK</span><h2>Good journeys begin with a conversation.</h2><p style="color:rgb(255 255 255 / 70%);font-size:12px">Our team is happy to help with a reservation, a vehicle question or a bespoke request.</p><div class="contact-line"><small>Call / WhatsApp</small><a href="https://wa.me/919104881806" target="_blank" rel="noopener">+91 91048 81806 · Message us ↗</a></div><div class="contact-line"><small>Email</small><a href="mailto:vinicarrental@gmail.com">vinicarrental@gmail.com</a></div></div></div>
+      <section class="section section-tight"><div class="contact-grid"><div><div class="contact-card"><span class="eyebrow">LET'S TALK</span><h2>Good journeys begin with a conversation.</h2><p class="contact-intro">Our team is happy to help with a reservation, a vehicle question or a bespoke request.</p><div class="contact-line"><small>Call / WhatsApp</small><a href="https://wa.me/919104881806" target="_blank" rel="noopener">+91 91048 81806 · Message us ↗</a></div><div class="contact-line"><small>Email</small><a href="mailto:vinicarrental@gmail.com">vinicarrental@gmail.com</a></div></div></div>
       <div><div class="form-card">${infoBar()}<form id="contact-form"><div class="form-grid"><div class="form-field"><label for="contact-name">Your name</label><input id="contact-name" name="name" required minlength="2"></div><div class="form-field"><label for="contact-email">Email address</label><input id="contact-email" name="email" type="email" required></div><div class="form-field"><label for="contact-phone">Phone (optional)</label><input id="contact-phone" name="phone" type="tel"></div><div class="form-field"><label for="contact-subject">How can we help?</label><select id="contact-subject" name="subject"><option>Booking enquiry</option><option>Fleet question</option><option>Corporate travel</option><option>Other</option></select></div><div class="form-field full"><label for="contact-message">Your message</label><textarea id="contact-message" name="message" required minlength="10" maxlength="3000"></textarea></div></div><button class="button button-dark" type="submit"${configured ? "" : " disabled"}>Send your enquiry ↗</button></form></div></div></div></section>`;
   }
 
@@ -174,7 +174,7 @@
 
   function adminPage() {
     if (!configured) return `${pageHero("VINI OPERATIONS", "Admin dashboard", "Connect Supabase to manage reservations, enquiries and your vehicle collection.")}<section class="section">${infoBar()}</section>`;
-    if (!adminUser) return `${pageHero("VINI OPERATIONS", "Welcome back.", "Sign in with an administrator account to manage the VINI collection.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-login"><div class="page-heading"><span class="eyebrow">SECURE ADMINISTRATION</span><h1 style="font-size:34px">Team sign in.</h1></div><div class="form-grid"><div class="form-field full"><label for="admin-email">Email</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div><div class="form-field full"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required></div></div><p class="form-note">Admin access is granted to specific accounts using the Supabase SQL setup instructions. There is no public admin sign-up.</p><button class="button button-dark" type="submit">Sign in ↗</button><div id="admin-login-message"></div></form></div></section>`;
+    if (!adminUser) return `${pageHero("VINI OPERATIONS", "Welcome back.", "Sign in with an administrator account to manage the VINI collection.")}<section class="section section-tight"><div class="content-narrow form-card"><form id="admin-login"><div class="page-heading"><span class="eyebrow">SECURE ADMINISTRATION</span><h1 class="form-heading-title">Team sign in.</h1></div><div class="form-grid"><div class="form-field full"><label for="admin-email">Email</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div><div class="form-field full"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required></div></div><p class="form-note">Admin access is granted to specific accounts using the Supabase SQL setup instructions. There is no public admin sign-up.</p><button class="button button-dark" type="submit">Sign in ↗</button><div id="admin-login-message"></div></form></div></section>`;
     return `<section class="admin-shell"><div class="admin-top"><div><span class="eyebrow">VINI OPERATIONS</span><h1>Dashboard</h1></div><button class="button button-outline button-small" id="admin-signout">Sign out</button></div><div class="admin-tabs">${[["bookings", "Bookings"], ["vehicles", "Vehicles"], ["enquiries", "Enquiries"]].map(([key, title]) => `<button class="admin-tab${adminTab === key ? " active" : ""}" data-admin-tab="${key}">${title}</button>`).join("")}</div><div class="admin-panel" id="admin-panel"><div class="loading">Loading dashboard…</div></div></section>`;
   }
 
@@ -517,23 +517,103 @@
       <div class="form-field full"><label for="vehicle-gallery">Additional gallery photo URLs (one per line)</label><textarea id="vehicle-gallery" name="gallery_urls" placeholder="https://…">${escapeHtml((car.gallery_urls || []).join("\n"))}</textarea></div>
       <div class="form-field full"><label for="vehicle-description">Description</label><textarea id="vehicle-description" name="description" required>${escapeHtml(car.description || "")}</textarea></div>
       <div class="form-field full"><label for="vehicle-features">Features (one per line)</label><textarea id="vehicle-features" name="features">${escapeHtml((car.features || []).join("\n"))}</textarea></div>
-      <div class="form-field full"><label><input name="is_featured" type="checkbox"${car.is_featured ? " checked" : ""} style="min-height:auto;width:auto"> Feature this vehicle</label> <label><input name="is_available" type="checkbox"${car.is_available !== false ? " checked" : ""} style="min-height:auto;width:auto"> Available for new requests</label></div>
-      <div class="form-field full" style="display:flex;flex-direction:row;gap:10px"><button class="button button-dark button-small" type="submit">${isEdit ? "Save changes" : "Add vehicle"}</button>${isEdit ? '<button class="button button-outline button-small" type="button" id="vehicle-cancel-edit">Cancel</button>' : ""}</div>
+      <div class="form-field full admin-checkboxes"><label><input name="is_featured" type="checkbox"${car.is_featured ? " checked" : ""}> Feature this vehicle</label><label><input name="is_available" type="checkbox"${car.is_available !== false ? " checked" : ""}> Available for new requests</label></div>
+      <div class="form-field full admin-form-actions"><button class="button button-dark button-small" type="submit">${isEdit ? "Save changes" : "Add vehicle"}</button>${isEdit ? '<button class="button button-outline button-small" type="button" id="vehicle-cancel-edit">Cancel</button>' : ""}</div>
     </form>`;
   }
 
   function renderAdminVehicles(panel) {
-    panel.innerHTML = `<h2 style="color:var(--navy);font:400 25px var(--serif)">Your collection</h2><p class="form-note">Changes are live immediately. Uploaded vehicle photos are stored in the private-to-admin, public-read vehicle-photos bucket.</p><div id="vehicle-editor">${vehicleFormMarkup()}</div><div style="overflow-x:auto"><table class="admin-list"><thead><tr><th>Vehicle</th><th>Category</th><th>Rate / day</th><th>Availability</th><th>Actions</th></tr></thead><tbody>${adminVehicles.map((car) => `<tr><td>${escapeHtml(car.make)} ${escapeHtml(car.model)} (${escapeHtml(car.year)})</td><td>${escapeHtml(car.categories?.name || "")}</td><td>${money.format(Number(car.daily_rate))}</td><td>${car.is_available ? "Available" : "Hidden"}</td><td><div class="admin-actions"><button data-edit-vehicle="${car.id}">Edit</button><button data-toggle-vehicle="${car.id}" data-next="${!car.is_available}">${car.is_available ? "Hide" : "Show"}</button></div></td></tr>`).join("")}</tbody></table></div>`;
+    const vehicleRows = adminVehicles.length
+      ? adminVehicles.map((car) => `<tr>
+          <td><strong>${escapeHtml(car.make)} ${escapeHtml(car.model)}</strong><span class="admin-subtext">${escapeHtml(car.year)}</span></td>
+          <td>${escapeHtml(car.categories?.name || "—")}</td>
+          <td class="admin-number">${money.format(Number(car.daily_rate))}</td>
+          <td><span class="admin-status${car.is_available ? " is-available" : " is-hidden"}">${car.is_available ? "Available" : "Hidden"}</span></td>
+          <td><div class="admin-actions">
+            <button type="button" data-edit-vehicle="${escapeHtml(car.id)}">Edit</button>
+            <button type="button" data-toggle-vehicle="${escapeHtml(car.id)}" data-next="${!car.is_available}">${car.is_available ? "Hide" : "Show"}</button>
+            <button type="button" class="admin-delete" data-delete-vehicle="${escapeHtml(car.id)}">Delete</button>
+          </div></td>
+        </tr>`).join("")
+      : '<tr><td colspan="5"><div class="empty-state admin-empty">Your collection is empty. Add your first vehicle using the form above.</div></td></tr>';
+
+    panel.innerHTML = `<div class="admin-section-heading"><div><span class="eyebrow">FLEET MANAGEMENT</span><h2 class="admin-section-title">Your collection</h2><p class="form-note">Add, update, hide or permanently remove vehicles. Changes are saved directly to your catalogue.</p></div><span class="admin-count">${adminVehicles.length} ${adminVehicles.length === 1 ? "vehicle" : "vehicles"}</span></div>
+      <div id="vehicle-editor">${vehicleFormMarkup()}</div>
+      <div class="admin-table-wrap"><table class="admin-list"><thead><tr><th>Vehicle</th><th>Category</th><th>Rate / day</th><th>Availability</th><th>Actions</th></tr></thead><tbody>${vehicleRows}</tbody></table></div>
+      <p class="admin-delete-note">Deleting a vehicle does not delete its booking history. Cars linked to existing bookings may be protected by the database; use <strong>Hide</strong> to remove those cars from the public fleet while keeping their records.</p>`;
+
     panel.querySelectorAll("[data-edit-vehicle]").forEach((button) => button.addEventListener("click", () => {
       const car = adminVehicles.find((item) => item.id === button.dataset.editVehicle);
+      if (!car) return;
       document.querySelector("#vehicle-editor").innerHTML = vehicleFormMarkup(car);
       bindVehicleForm();
+      document.querySelector("#vehicle-editor").scrollIntoView({ behavior: "smooth", block: "start" });
     }));
+
     panel.querySelectorAll("[data-toggle-vehicle]").forEach((button) => button.addEventListener("click", async () => {
+      button.disabled = true;
       const { error } = await db.from("vehicles").update({ is_available: button.dataset.next === "true" }).eq("id", button.dataset.toggleVehicle);
-      if (error) return toast(error.message, true);
+      if (error) {
+        button.disabled = false;
+        return toast(error.message, true);
+      }
+      toast(button.dataset.next === "true" ? "Vehicle is visible in the fleet." : "Vehicle hidden from the public fleet.");
       loadAdmin();
     }));
+
+    panel.querySelectorAll("[data-delete-vehicle]").forEach((button) => button.addEventListener("click", async () => {
+      const car = adminVehicles.find((item) => item.id === button.dataset.deleteVehicle);
+      if (!car) return;
+      const vehicleName = `${car.make} ${car.model} (${car.year})`;
+      const confirmed = window.confirm(`Permanently delete ${vehicleName} from the vehicle catalogue? This cannot be undone. Vehicles with booking history must be hidden instead so their records stay intact.`);
+      if (!confirmed) return;
+
+      button.disabled = true;
+      button.textContent = "Checking…";
+      const { count: bookingCount, error: historyError } = await db
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("vehicle_id", car.id);
+
+      if (historyError) {
+        button.disabled = false;
+        button.textContent = "Delete";
+        return toast(`Booking history could not be checked, so this vehicle was not deleted: ${historyError.message}`, true);
+      }
+      if (bookingCount > 0) {
+        button.disabled = false;
+        button.textContent = "Delete";
+        return toast("This vehicle has booking history and cannot be deleted. Use Hide to remove it from the public fleet while preserving its records.", true);
+      }
+
+      button.textContent = "Deleting…";
+      const { data: deletedVehicle, error } = await db
+        .from("vehicles")
+        .delete()
+        .eq("id", car.id)
+        .select("id")
+        .maybeSingle();
+
+      if (error) {
+        button.disabled = false;
+        button.textContent = "Delete";
+        if (error.code === "23503") {
+          return toast("The database protects a related record for this vehicle. Use Hide to remove it from the public fleet while preserving its history.", true);
+        }
+        return toast(`Vehicle could not be deleted: ${error.message}`, true);
+      }
+      if (!deletedVehicle) {
+        button.disabled = false;
+        button.textContent = "Delete";
+        return toast("No vehicle was deleted. Check your administrator permissions and try again.", true);
+      }
+
+      vehicles = vehicles.filter((item) => item.id !== car.id);
+      adminVehicles = adminVehicles.filter((item) => item.id !== car.id);
+      toast(`${vehicleName} was deleted from the catalogue.`);
+      loadAdmin();
+    }));
+
     bindVehicleForm();
   }
 
