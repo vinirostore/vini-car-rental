@@ -1,18 +1,18 @@
-VINI CAR RENTAL — SOURCE UPDATE
+VINI CAR RENTAL — UPDATE NOTES
 
-Included files
-- index.html: updated Google Fonts import and cache-busting for the refreshed CSS/JS.
-- styles.css: premium Cormorant Garamond + Manrope typography system, improved sizing/readability, responsive admin styling.
-- app.js: Admin > Vehicles now has a confirmed Delete action; it checks booking history first and blocks deletion when bookings exist.
-- supabase-config.js: original project URL and public publishable key retained unchanged.
-- DEPLOYMENT.md: updated setup and deployment notes.
-- supabase/admin-delete-vehicles.sql: run once in Supabase SQL Editor after the base schema to grant delete only to authenticated admins.
+This package carries forward the previous admin delete and premium typography changes, and adds:
+- Homepage shows the complete available vehicle catalogue, not only featured vehicles.
+- Every car card displays all features saved for that car.
+- Homepage hero slideshow is generated from actual catalogue vehicle image_url values (up to six); no unrelated stock hero images are used.
+- Admin add/edit vehicle form supports SUV, Hatchback, Sedan, Sports, Van, MUV / MPV, Luxury, Convertible, Coupe, Electric and Pickup after running the category migration.
+- Admin can create a custom vehicle type from the add-vehicle form.
 
-Deploy
-1. Back up the current website files.
-2. Replace index.html, styles.css and app.js on the website with these updated copies. Keep your existing logo and vehicle image files in the document root.
-3. Keep your existing supabase-config.js values. The included copy is unchanged from the uploaded source.
-4. Run supabase/admin-delete-vehicles.sql once in the Supabase SQL Editor while signed in as the project owner.
-5. Test admin sign-in, Add/Edit/Hide, Delete on a vehicle with no bookings, and confirm that a vehicle with booking history is blocked from deletion.
+DEPLOYMENT
+1. Back up current site files.
+2. Replace app.js, styles.css, index.html and DEPLOYMENT.md.
+3. Keep the existing supabase-config.js and brand image assets; the package includes the current config for reference.
+4. Run supabase/vehicle-category-options.sql once in Supabase SQL Editor.
+5. Keep the previously supplied supabase/admin-delete-vehicles.sql migration applied. If not yet applied, run it once too.
+6. Upload the included supabase SQL files only as deployment references; SQL migrations must be run in the Supabase SQL Editor.
 
-The base Supabase schema and image assets were not included in the uploaded source set, so they are not recreated or replaced in this package. Existing database tables, booking logic and image assets are intended to remain in place.
+Existing booking flow and Supabase client configuration are preserved.

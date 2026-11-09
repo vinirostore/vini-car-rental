@@ -25,6 +25,10 @@ This site is plain HTML, CSS and browser JavaScript. It does not use a Node.js s
 
    This privileged role assignment is intentionally not exposed through the public website. Use a strong unique password and enable MFA for admin accounts where available.
 
+### Vehicle types and homepage catalogue (updated source)
+
+Run [`supabase/vehicle-category-options.sql`](./supabase/vehicle-category-options.sql) once in the Supabase **SQL Editor** to add the standard vehicle types: SUV, Hatchback, Sedan, Sports, Van, MUV / MPV, Luxury, Convertible, Coupe, Electric and Pickup. In Admin → Vehicles, choose one of these types or select **+ Add a new vehicle type** to create a custom type while adding a car. The homepage now displays the full available catalogue and each vehicle’s saved feature list. Its hero slideshow uses photographs from vehicles currently in the website catalogue; it no longer uses unrelated stock hero photos.
+
 ### Admin vehicle deletion permission (updated source)
 
 After installing the base schema, run [`supabase/admin-delete-vehicles.sql`](./supabase/admin-delete-vehicles.sql) once in the Supabase **SQL Editor**. It grants `DELETE` only to authenticated users whose account passes `public.is_admin()`; it does not grant public deletion access.
@@ -67,7 +71,7 @@ Use a strong, unique password for each administrator. Password-only sign-in is l
 - WhatsApp requests are not confirmed bookings and do not charge a payment method. An administrator reviews any saved pending request and confirms it in **Admin → Bookings**.
 - PostgreSQL enforces a GiST exclusion constraint over confirmed vehicle date ranges. Concurrent attempts to confirm overlapping bookings cannot both succeed. Date ranges use `[pickup, return)`, so a car can be returned and re-rented on the same calendar date. A conflict is returned as an error in the admin dashboard; keep the conflicting request pending or cancel it.
 - Guests can retrieve limited booking status and vehicle/date/total details using the random UUID reference returned at submission. Treat that reference like a private access token.
-- The admin dashboard supports reservation status management, vehicle create/edit/delete, daily price and availability changes, image uploads to Supabase Storage, and enquiry review. Vehicles with booking history must be hidden rather than deleted to preserve their records. Admin data access and writes require an authenticated user whose role is assigned in `profiles`; database RLS is authoritative.
+- The admin dashboard supports reservation status management, vehicle create/edit/delete and vehicle-type management, daily price and availability changes, image uploads to Supabase Storage, and enquiry review. Vehicles with booking history must be hidden rather than deleted to preserve their records. Admin data access and writes require an authenticated user whose role is assigned in `profiles`; database RLS is authoritative.
 - The Contact enquiry form creates records in Supabase when credentials are configured. Reservation requests can always be composed and sent via WhatsApp; booking records and status lookup require Supabase.
 
 ## 5. Security and launch checklist

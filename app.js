@@ -78,6 +78,7 @@
         <span class="vehicle-category">${escapeHtml(label)} · ${escapeHtml(car.year)}</span>
         <h3 class="vehicle-title">${escapeHtml(car.make)} ${escapeHtml(car.model)}</h3>
         <div class="vehicle-specs"><span>${escapeHtml(car.seats)} seats</span><span>${escapeHtml(car.transmission || "Automatic")}</span><span>${escapeHtml(car.fuel || "Premium")}</span></div>
+        ${(car.features || []).length ? `<ul class="vehicle-feature-chips">${car.features.map((feature) => `<li>${escapeHtml(feature)}</li>`).join("")}</ul>` : ""}
         <div class="vehicle-price-row"><span class="vehicle-price">${money.format(Number(car.daily_rate || 0))} <small>/ day</small></span><a class="arrow-link" href="${carHref}" aria-label="Explore car">↗</a></div>
       </div>
     </article>`;
@@ -95,9 +96,11 @@
   }
 
   function homePage() {
-    const featured = vehicles.filter((car) => car.is_featured).slice(0, 3);
-    const display = featured.length ? featured : vehicles.slice(0, 3);
-    return `<section class="hero"><div class="hero-slides" aria-hidden="true"><img class="hero-slide is-active" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2400&q=90" alt=""><img class="hero-slide" src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=2400&q=90" alt=""><img class="hero-slide" src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=2400&q=90" alt=""></div><div class="hero-inner"><span class="hero-kicker"><span class="hero-kicker-line"></span> VINI CAR RENTAL <span class="hero-kicker-dot"></span> INDIA</span><h1>Make the<br>road <em>yours.</em></h1><p class="hero-copy">Exceptional cars. Considered service.<br>A more beautiful way to arrive.</p><div class="hero-actions"><a class="button" href="#fleet">Discover the collection <span aria-hidden="true">↗</span></a><a class="hero-secondary-link" href="#about"><span class="play-icon">↗</span> The VINI experience</a></div></div><div class="hero-caption"><span class="hero-scroll"><i></i> SCROLL TO EXPLORE</span><span class="hero-caption-center">THE ART OF ARRIVING</span><span class="hero-edition">01 <i></i> 06</span></div></section>
+    // The homepage is the full live catalogue, not only a featured subset.
+    const display = vehicles;
+    const heroCars = vehicles.filter((car) => car.image_url).slice(0, 6);
+    const heroSlides = heroCars.map((car, index) => `<img class="hero-slide${index === 0 ? " is-active" : ""}" src="${escapeHtml(car.image_url)}" alt="${escapeHtml(`${car.year || ""} ${car.make} ${car.model}`)}"${index ? " loading=\"lazy\"" : ""}>`).join("");
+    return `<section class="hero"><div class="hero-slides" aria-hidden="true">${heroSlides || "<div class=\"hero-slide hero-slide-empty is-active\"></div>"}</div><div class="hero-inner"><span class="hero-kicker"><span class="hero-kicker-line"></span> VINI CAR RENTAL <span class="hero-kicker-dot"></span> INDIA</span><h1>Make the<br>road <em>yours.</em></h1><p class="hero-copy">Exceptional cars. Considered service.<br>A more beautiful way to arrive.</p><div class="hero-actions"><a class="button" href="#fleet">Discover the collection <span aria-hidden="true">↗</span></a><a class="hero-secondary-link" href="#about"><span class="play-icon">↗</span> The VINI experience</a></div></div><div class="hero-caption"><span class="hero-scroll"><i></i> SCROLL TO EXPLORE</span><span class="hero-caption-center">THE ART OF ARRIVING</span><span class="hero-edition">01 <i></i> ${String(Math.max(heroCars.length, 1)).padStart(2, "0")}</span></div></section>
       ${infoBar() ? `<div class="section section-tight">${infoBar()}</div>` : ""}${bookingWidget()}
       <section class="section"><div class="section-heading"><div><span class="eyebrow">A STUDY IN EXCEPTION</span><h2>Not simply driven.<br><em>Felt.</em></h2></div><div><p>Rarely ordinary. Always remarkable. Discover the cars that make every arrival part of the story.</p><a class="text-link" href="#fleet">Explore the collection <span>↗</span></a></div></div>
       <div class="vehicle-grid">${display.map((car) => vehicleCard(car)).join("")}</div></section>
@@ -108,7 +111,7 @@
   function fleetPage(params) {
     const selectedCategory = params.get("category") || "";
     return `${pageHero("THE VINI COLLECTION", "A car for your kind of journey.", "From composed city arrivals to open-road escapes, find the right companion for the miles ahead.")}
-      <section class="section section-tight">${infoBar()}<div class="filter-row"><div class="filter-buttons" id="fleet-filters"><button class="filter-chip${!selectedCategory ? " active" : ""}" data-category="">All vehicles</button>${["Sedan", "SUV", "Sports", "Van"].map((item) => `<button class="filter-chip${selectedCategory === slug(item) ? " active" : ""}" data-category="${slug(item)}">${item}</button>`).join("")}</div>
+      <section class="section section-tight">${infoBar()}<div class="filter-row"><div class="filter-buttons" id="fleet-filters"><button class="filter-chip${!selectedCategory ? " active" : ""}" data-category="">All vehicles</button>${(categories.length ? categories : [{ name: "Sedan", slug: "sedan" }, { name: "Hatchback", slug: "hatchback" }, { name: "SUV", slug: "suv" }, { name: "Sports", slug: "sports" }, { name: "Van", slug: "van" }]).map((item) => `<button class="filter-chip${selectedCategory === item.slug ? " active" : ""}" data-category="${escapeHtml(item.slug)}">${escapeHtml(item.name)}</button>`).join("")}</div>
       <select class="sort-select" id="fleet-sort" aria-label="Sort vehicles"><option value="featured">Curated selection</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></div>
       <div class="vehicle-grid" id="fleet-grid"></div><div id="fleet-empty"></div></section>`;
   }
@@ -507,7 +510,8 @@
       <div class="form-field"><label for="vehicle-make">Make</label><input id="vehicle-make" name="make" required value="${escapeHtml(car.make || "")}"></div>
       <div class="form-field"><label for="vehicle-model">Model</label><input id="vehicle-model" name="model" required value="${escapeHtml(car.model || "")}"></div>
       <div class="form-field"><label for="vehicle-year">Year</label><input id="vehicle-year" name="year" type="number" min="1990" max="2099" required value="${escapeHtml(car.year || new Date().getFullYear())}"></div>
-      <div class="form-field"><label for="vehicle-category">Category</label><select id="vehicle-category" name="category_id" required>${categories.map((category) => `<option value="${escapeHtml(category.id)}"${car.category_id === category.id ? " selected" : ""}>${escapeHtml(category.name)}</option>`).join("")}</select></div>
+      <div class="form-field"><label for="vehicle-category">Vehicle type</label><select id="vehicle-category" name="category_id" required>${categories.map((category) => `<option value="${escapeHtml(category.id)}"${car.category_id === category.id ? " selected" : ""}>${escapeHtml(category.name)}</option>`).join("")}<option value="__new__">+ Add a new vehicle type</option></select></div>
+      <div class="form-field" id="new-category-field" hidden><label for="vehicle-new-category">New vehicle type</label><input id="vehicle-new-category" name="new_category" placeholder="e.g. Convertible" maxlength="40"></div>
       <div class="form-field"><label for="vehicle-rate">Daily rate (INR)</label><input id="vehicle-rate" name="daily_rate" type="number" min="1" step="1" required value="${escapeHtml(car.daily_rate || "")}"></div>
       <div class="form-field"><label for="vehicle-seats">Seats</label><input id="vehicle-seats" name="seats" type="number" min="1" max="20" required value="${escapeHtml(car.seats || 5)}"></div>
       <div class="form-field"><label for="vehicle-luggage">Luggage capacity</label><input id="vehicle-luggage" name="luggage" type="number" min="0" max="20" value="${escapeHtml(car.luggage || 2)}"></div>
@@ -621,12 +625,35 @@
     const form = document.querySelector("#vehicle-form");
     if (!form) return;
     document.querySelector("#vehicle-cancel-edit")?.addEventListener("click", () => renderAdminVehicles(document.querySelector("#admin-panel")));
+    const categorySelect = form.elements.category_id;
+    const newCategoryField = form.querySelector("#new-category-field");
+    const newCategoryInput = form.elements.new_category;
+    categorySelect.addEventListener("change", () => {
+      const adding = categorySelect.value === "__new__";
+      newCategoryField.hidden = !adding;
+      newCategoryInput.required = adding;
+      if (adding) newCategoryInput.focus();
+    });
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
       const values = new FormData(form);
       const id = form.dataset.id;
       const existing = adminVehicles.find((car) => car.id === id);
+      let categoryId = values.get("category_id");
+      if (categoryId === "__new__") {
+        const categoryName = String(values.get("new_category") || "").trim();
+        if (!categoryName) return toast("Enter a name for the new vehicle type.", true);
+        const categorySlug = slug(categoryName);
+        const existingCategory = categories.find((item) => item.slug === categorySlug);
+        if (existingCategory) categoryId = existingCategory.id;
+        else {
+          const { data: createdCategory, error: categoryError } = await db.from("categories").insert({ name: categoryName, slug: categorySlug, is_active: true }).select("id,name,slug").single();
+          if (categoryError) return toast(`Vehicle type could not be created: ${categoryError.message}`, true);
+          categories.push(createdCategory);
+          categoryId = createdCategory.id;
+        }
+      }
       let imageUrl = existing?.image_url || "";
       const uploadedUrls = [];
       for (const photo of values.getAll("photos")) {
@@ -649,7 +676,7 @@
         make: values.get("make").trim(),
         model: values.get("model").trim(),
         year: Number(values.get("year")),
-        category_id: values.get("category_id"),
+        category_id: categoryId,
         daily_rate: Number(values.get("daily_rate")),
         seats: Number(values.get("seats")),
         luggage: Number(values.get("luggage") || 0),
